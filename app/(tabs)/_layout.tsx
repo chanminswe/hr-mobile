@@ -29,13 +29,13 @@ export default function TabsLayout() {
 				<Tabs.Screen name='leave'
 					options={{
 						title: "Leave",
-						tabBarIcon: ({ color, size }) => <Ionicons name='people' size={size} color={color} />
+						tabBarIcon: ({ color, size }) => <Ionicons name='calendar' size={size} color={color} />
 					}}
 				/>
-				<Tabs.Screen name='calendar'
+				<Tabs.Screen name='profile'
 					options={{
-						title: 'Calendar',
-						tabBarIcon: ({ color, size }) => <Ionicons name='calendar' size={size} color={color} />
+						title: 'Profile',
+						tabBarIcon: ({ color, size }) => <Ionicons name='person-circle' size={size} color={color} />
 					}}
 				/>
 			</Tabs>

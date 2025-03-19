@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -54,31 +54,30 @@ const Home = () => {
 			{/* Buttons Section */}
 			<View style={styles.buttonContainer}>
 				<View style={styles.iconContainer}>
-					<View style={styles.iconCircle}>
+					<TouchableOpacity style={styles.iconCircle}>
 						<Ionicons name='pencil' size={24} color={'orange'} />
-					</View>
+					</TouchableOpacity>
 					<Text style={styles.iconText}>Check In</Text>
 				</View>
 				<View style={styles.iconContainer}>
-					<View style={styles.iconCircle}>
+					<TouchableOpacity style={styles.iconCircle}>
 						<Ionicons name='hand-left' size={24} color={'purple'} />
-					</View>
+					</TouchableOpacity>
 					<Text style={styles.iconText}>Check Out</Text>
 				</View>
 				<View style={styles.iconContainer}>
-					<View style={styles.iconCircle}>
+					<TouchableOpacity style={styles.iconCircle}>
 						<Ionicons name='location' size={24} color={'blue'} />
-					</View>
+					</TouchableOpacity>
 					<Text style={styles.iconText}>Remote In</Text>
 				</View>
 				<View style={styles.iconContainer}>
-					<View style={styles.iconCircle}>
+					<TouchableOpacity style={styles.iconCircle}>
 						<Ionicons name='airplane' size={24} color={'gray'} />
-					</View>
+					</TouchableOpacity>
 					<Text style={styles.iconText}>Remote Out</Text>
 				</View>
 			</View>
-
 			{/* Quote Section */}
 			<View style={styles.quotesContainer}>
 				<Text style={styles.quoteText}>
