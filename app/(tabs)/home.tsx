@@ -3,12 +3,37 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { quotes, QuotesType } from '../../constants/quotes';
+import axios from 'axios';
+
+type UserInformation = {
+	userId: number;
+	checkInTime: Date;
+	checkOutTime: Date;
+	checkedInDate: Date;
+	checkedIn: boolean;
+}
 
 const Home = () => {
 	const today = new Date();
 	const date = today.getDate();
-	const month = today.getMonth() + 1;
 	const [quote, setQuote] = useState<QuotesType | null>(null);
+	const [userInformation, setUserInformation] = useState<UserInformation | []>([]);
+
+	async function checkIn() {
+		try {
+			console.log("checking in");
+			const response = await axios.post('http://localhost:8080/user/informations/checkIn', {}, {
+				headers: {
+					'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q1OGQ3MWI2MDQ4OGFjYWIwZjM0OTEiLCJlbWFpbCI6ImpvaG5kb2VAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIyMDE5MDAsImV4cCI6MTc1MDg0MTkwMH0.YZdR4Xkrif1gDi2_xKk5wniid1vUe1lapMZpyf6NMVs`,
+				}
+			});
+			console.log("done checked in");
+			console.log(response.data);
+			setUserInformation(response.data.userInformation);
+		} catch (error: any) {
+			console.error("Error during check-in:", error.response ? error.response.data : error.message);
+		}
+	}
 
 	useEffect(() => {
 		const getRandomQuote = () => {
@@ -43,7 +68,12 @@ const Home = () => {
 			<View style={styles.checkContainer}>
 				<View style={styles.checkInOut}>
 					<Text style={styles.checkLabel}>Check In</Text>
-					<Text style={styles.checkTime}>8:30 AM</Text>
+					<Text style={styles.checkTime}>
+						{userInformation && userInformation.checkInTime
+							? new Date(userInformation.checkInTime).toLocaleTimeString()
+							: '--:--'}
+					</Text>
+
 				</View>
 				<View style={styles.checkInOut}>
 					<Text style={styles.checkLabel}>Check Out</Text>
@@ -54,7 +84,9 @@ const Home = () => {
 			{/* Buttons Section */}
 			<View style={styles.buttonContainer}>
 				<View style={styles.iconContainer}>
-					<TouchableOpacity style={styles.iconCircle}>
+					<TouchableOpacity
+						onPress={checkIn}
+						style={styles.iconCircle}>
 						<Ionicons name='pencil' size={24} color={'orange'} />
 					</TouchableOpacity>
 					<Text style={styles.iconText}>Check In</Text>
