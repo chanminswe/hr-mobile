@@ -7,8 +7,8 @@ import axios from 'axios';
 
 interface UserInformation {
 	userId: number;
-	checkInTime: Date;
-	checkOutTime: Date;
+	checkInTime: string;
+	checkOutTime: string;
 	checkedInDate: Date;
 	checkedIn: boolean;
 }
@@ -17,30 +17,19 @@ const Home = () => {
 	const today = new Date();
 	const date = today.getDate();
 	const [quote, setQuote] = useState<QuotesType | null>(null);
-	const [userInformation, setUserInformation] = useState<UserInformation | []>([]);
-	let hours: string;
-	let mins: string;
-
-	useEffect(() => {
-		async function getUserInformation() {
-
-		}
-
-		getUserInformation();
-	}, [])
+	const [userInformation, setUserInformation] = useState<UserInformation | null>(null);
 
 	async function checkIn() {
 		try {
-			console.log("checking in");
+			console.log("Checking in...");
 			const response = await axios.post('http://localhost:8080/user/informations/checkIn', {}, {
 				headers: {
 					'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q1OGQ3MWI2MDQ4OGFjYWIwZjM0OTEiLCJlbWFpbCI6ImpvaG5kb2VAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIyMDE5MDAsImV4cCI6MTc1MDg0MTkwMH0.YZdR4Xkrif1gDi2_xKk5wniid1vUe1lapMZpyf6NMVs`,
 				}
 			});
-			console.log("done checked in");
-			console.log(response.data);
+			console.log("Check-in successful:", response.data);
 		} catch (error: any) {
-			console.error("Error during check-in:", error.response.message);
+			console.error("Error during check-in:", error.response?.data?.message || error.message);
 		}
 	}
 
@@ -50,8 +39,24 @@ const Home = () => {
 			setQuote(quotes[randomIndex]);
 		};
 
+		async function getUserInformation() {
+			try {
+				const response = await axios.get('http://localhost:8080/user/informations/personalInformations', {
+					headers: {
+						'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q1OGQ3MWI2MDQ4OGFjYWIwZjM0OTEiLCJlbWFpbCI6ImpvaG5kb2VAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIyMDE5MDAsImV4cCI6MTc1MDg0MTkwMH0.YZdR4Xkrif1gDi2_xKk5wniid1vUe1lapMZpyf6NMVs`
+					}
+				});
+				console.log("User information fetched:", response.data.userInfo);
+				setUserInformation(response.data.userInfo);
+			} catch (error: any) {
+				console.error("Error fetching user information:", error.response?.data?.message || error.message);
+			}
+		}
+
+		getUserInformation();
 		getRandomQuote();
 	}, []);
+
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -78,16 +83,14 @@ const Home = () => {
 				<View style={styles.checkInOut}>
 					<Text style={styles.checkLabel}>Check In</Text>
 					<Text style={styles.checkTime}>
-						{/* <Text style={styles.checkTime}>{userInformation ? `${hours} : ${mins}` : '--:--'}</Text> */}
-						<Text style={styles.checkTime}>--:--</Text>
-
-
+						--:--
 					</Text>
-
 				</View>
 				<View style={styles.checkInOut}>
 					<Text style={styles.checkLabel}>Check Out</Text>
-					<Text style={styles.checkTime}>--:--</Text>
+					<Text style={styles.checkTime}>
+						'--:--'
+					</Text>
 				</View>
 			</View>
 
@@ -120,6 +123,7 @@ const Home = () => {
 					<Text style={styles.iconText}>Remote Out</Text>
 				</View>
 			</View>
+
 			{/* Quote Section */}
 			<View style={styles.quotesContainer}>
 				<Text style={styles.quoteText}>
@@ -240,13 +244,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 10,
 		marginHorizontal: 20,
-		// backgroundColor: '#fff',
-		// borderRadius: 20,
-		// shadowColor: '#000',
-		// shadowOffset: { width: 0, height: 2 },
-		// shadowOpacity: 0.1,
-		// shadowRadius: 6,
-		// elevation: 3,
 	},
 	quoteText: {
 		fontSize: 18,
