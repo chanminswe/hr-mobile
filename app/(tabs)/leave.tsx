@@ -56,24 +56,27 @@ const Leave = () => {
 					onDayPress={onDayPress}
 				/>
 			</View>
-			<Picker
-				style={styles.picker}
-				selectedValue={leaveType}
-				onValueChange={(itemValue) => setLeaveType(itemValue)}
-			>
-				<Picker.Item label="Annual Leave" value="annual" />
-				<Picker.Item label="Casual Leave" value="casual" />
-				<Picker.Item label="Unpaid Leave" value="unpaid" />
-				<Picker.Item label="Medical Leave" value="medical" />
-			</Picker>
-			<TouchableOpacity
-				style={styles.buttonContainer}
-			>
-				<Text style={{
-					color: 'white',
-					fontWeight: 'bold',
-				}}>Request Leave</Text>
-			</TouchableOpacity>
+			<View style={styles.pickerContainer} >
+				<Picker
+					style={styles.picker}
+					selectedValue={leaveType}
+					onValueChange={(itemValue) => setLeaveType(itemValue)}
+				>
+					<Picker.Item
+						label="Annual Leave" value="annual" />
+					<Picker.Item label="Casual Leave" value="casual" />
+					<Picker.Item label="Unpaid Leave" value="unpaid" />
+					<Picker.Item label="Medical Leave" value="medical" />
+				</Picker>
+				<TouchableOpacity
+					style={styles.buttonContainer}
+				>
+					<Text style={{
+						color: 'white',
+						fontWeight: 'bold',
+					}}>Request Leave</Text>
+				</TouchableOpacity>
+			</View>
 		</SafeAreaView>
 	);
 };
@@ -93,22 +96,27 @@ const styles = StyleSheet.create({
 		borderColor: 'gray',
 		borderRadius: 10,
 	},
+	pickerContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		paddingHorizontal: 10,
+		alignItems: 'center',
+		height: 'auto',
+		paddingBottom: 20,
+	},
 	picker: {
-		backgroundColor: '#363434',
-		height: 150,
-		width: '80%',
-		borderRadius: 25,
-		borderWidth: 1,
+		width: '50%',
 		paddingHorizontal: 10,
 	},
 	buttonContainer: {
 		backgroundColor: 'teal',
-		padding: 15,
+		height: 40,
+		padding: 10,
 		borderRadius: 15,
-		width: '80%',
+		width: '50%',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: 45
 	},
 
 });

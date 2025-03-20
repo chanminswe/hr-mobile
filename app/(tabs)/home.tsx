@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { quotes, QuotesType } from '../../constants/quotes';
 import axios from 'axios';
 
-type UserInformation = {
+interface UserInformation {
 	userId: number;
 	checkInTime: Date;
 	checkOutTime: Date;
@@ -18,6 +18,16 @@ const Home = () => {
 	const date = today.getDate();
 	const [quote, setQuote] = useState<QuotesType | null>(null);
 	const [userInformation, setUserInformation] = useState<UserInformation | []>([]);
+	let hours: string;
+	let mins: string;
+
+	useEffect(() => {
+		async function getUserInformation() {
+
+		}
+
+		getUserInformation();
+	}, [])
 
 	async function checkIn() {
 		try {
@@ -29,9 +39,8 @@ const Home = () => {
 			});
 			console.log("done checked in");
 			console.log(response.data);
-			setUserInformation(response.data.userInformation);
 		} catch (error: any) {
-			console.error("Error during check-in:", error.response ? error.response.data : error.message);
+			console.error("Error during check-in:", error.response.message);
 		}
 	}
 
@@ -69,9 +78,10 @@ const Home = () => {
 				<View style={styles.checkInOut}>
 					<Text style={styles.checkLabel}>Check In</Text>
 					<Text style={styles.checkTime}>
-						{userInformation && userInformation.checkInTime
-							? new Date(userInformation.checkInTime).toLocaleTimeString()
-							: '--:--'}
+						{/* <Text style={styles.checkTime}>{userInformation ? `${hours} : ${mins}` : '--:--'}</Text> */}
+						<Text style={styles.checkTime}>--:--</Text>
+
+
 					</Text>
 
 				</View>
