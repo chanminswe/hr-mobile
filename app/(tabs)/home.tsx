@@ -21,10 +21,10 @@ const Home = () => {
 					'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q1OGQ3MWI2MDQ4OGFjYWIwZjM0OTEiLCJlbWFpbCI6ImpvaG5kb2VAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIyMDE5MDAsImV4cCI6MTc1MDg0MTkwMH0.YZdR4Xkrif1gDi2_xKk5wniid1vUe1lapMZpyf6NMVs`,
 				}
 			});
-			console.log("Check-in successful:", response.data);
 			Alert.alert("Check In Sucess");
 		} catch (error: any) {
 			console.error("Error during check-in:", error.response?.data?.message || error.message);
+			Alert.alert("You have already checked in today");
 		}
 	}
 
@@ -80,8 +80,7 @@ const Home = () => {
 		getRandomQuote();
 		setTimeout(() => {
 			setRefreshing(false);
-		}, 2000);
-
+		}, 500);
 	}, []);
 
 	return (

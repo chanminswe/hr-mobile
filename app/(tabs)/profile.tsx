@@ -36,7 +36,6 @@ const Profile = () => {
 					<Text style={styles.optionText}>Help & Support</Text>
 				</TouchableOpacity>
 			</View>
-
 			{/* Logout Button */}
 			<TouchableOpacity style={styles.logoutButton}>
 				<Text style={styles.logoutText}>Logout</Text>

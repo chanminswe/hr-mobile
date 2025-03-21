@@ -19,7 +19,7 @@ type MarkedDates = {
 
 const Leave = () => {
 	const [selected, setSelected] = useState<string[]>([]);
-	const [leaveType, setLeaveType] = useState<string>();
+	const [leaveType, setLeaveType] = useState<string>('annual');
 
 	useEffect(() => {
 		console.log(selected);
@@ -41,9 +41,13 @@ const Leave = () => {
 	const requestLeave = async () => {
 		try {
 			console.log(selected, leaveType);
-			if (leaveType === undefined) {
-				setLeaveType('annual');
-			}
+			selected.map((dates, index) => {
+				if (new Date(dates) < new Date()) {
+					Alert.alert("You cannot select dates from the past !");
+					throw new Error("Old Date Selection Error");
+				}
+			})
+
 			if (selected.length <= 0) {
 				Alert.alert(
 					'Please Enter Leave Dates!',
@@ -88,9 +92,7 @@ const Leave = () => {
 					selectedValue={leaveType}
 					onValueChange={(itemValue) => setLeaveType(itemValue)}
 				>
-					<Picker.Item
-						color='black'
-						label="Annual Leave" value="annual" />
+					<Picker.Item label="Annual Leave" value="annual" color='black' />
 					<Picker.Item label="Casual Leave" value="casual" color='black' />
 					<Picker.Item label="Unpaid Leave" value="unpaid" color='black' />
 					<Picker.Item label="Medical Leave" value="medical" color='black' />
