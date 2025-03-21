@@ -1,25 +1,19 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, RefreshControl, ScrollView, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { quotes, QuotesType } from '../../constants/quotes';
 import axios from 'axios';
 
-interface UserInformation {
-	userId: number;
-	checkInTime: string;
-	checkOutTime: string;
-	checkedInDate: Date;
-	checkedIn: boolean;
-}
-
 const Home = () => {
 	const today = new Date();
 	const date = today.getDate();
 	const [quote, setQuote] = useState<QuotesType | null>(null);
-	const [userInformation, setUserInformation] = useState<UserInformation | null>(null);
+	const [checkInTime, setCheckInTime] = useState<Date | null>();
+	const [checkOutTime, setCheckOutTime] = useState<Date | null>();
+	const [refreshing, setRefreshing] = React.useState(false);
 
-	async function checkIn() {
+	async function handleCheckIn() {
 		try {
 			console.log("Checking in...");
 			const response = await axios.post('http://localhost:8080/user/informations/checkIn', {}, {
@@ -28,35 +22,67 @@ const Home = () => {
 				}
 			});
 			console.log("Check-in successful:", response.data);
+			Alert.alert("Check In Sucess");
 		} catch (error: any) {
 			console.error("Error during check-in:", error.response?.data?.message || error.message);
 		}
 	}
 
-	useEffect(() => {
-		const getRandomQuote = () => {
-			const randomIndex = Math.floor(Math.random() * quotes.length);
-			setQuote(quotes[randomIndex]);
-		};
-
-		async function getUserInformation() {
-			try {
-				const response = await axios.get('http://localhost:8080/user/informations/personalInformations', {
-					headers: {
-						'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q1OGQ3MWI2MDQ4OGFjYWIwZjM0OTEiLCJlbWFpbCI6ImpvaG5kb2VAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIyMDE5MDAsImV4cCI6MTc1MDg0MTkwMH0.YZdR4Xkrif1gDi2_xKk5wniid1vUe1lapMZpyf6NMVs`
-					}
-				});
-				console.log("User information fetched:", response.data.userInfo);
-				setUserInformation(response.data.userInfo);
-			} catch (error: any) {
-				console.error("Error fetching user information:", error.response?.data?.message || error.message);
-			}
+	async function handleCheckOut() {
+		try {
+			console.log("Checking in...");
+			const response = await axios.post('http://localhost:8080/user/informations/checkOut', {}, {
+				headers: {
+					'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q1OGQ3MWI2MDQ4OGFjYWIwZjM0OTEiLCJlbWFpbCI6ImpvaG5kb2VAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIyMDE5MDAsImV4cCI6MTc1MDg0MTkwMH0.YZdR4Xkrif1gDi2_xKk5wniid1vUe1lapMZpyf6NMVs`,
+				}
+			});
+			console.log("Check-out successful:", response.data);
+			Alert.alert("Check Out Sucess");
+		} catch (error: any) {
+			console.error("Error during check-in:", error.response?.data?.message || error.message);
 		}
+	}
 
+	async function getUserInformation() {
+		try {
+			const response = await axios.get('http://localhost:8080/user/informations/attendance', {
+				headers: {
+					'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2Q1OGQ3MWI2MDQ4OGFjYWIwZjM0OTEiLCJlbWFpbCI6ImpvaG5kb2VAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIyMDE5MDAsImV4cCI6MTc1MDg0MTkwMH0.YZdR4Xkrif1gDi2_xKk5wniid1vUe1lapMZpyf6NMVs`
+				}
+			});
+			console.log("User information fetched:", response.data);
+			setCheckInTime(new Date(response.data?.checkInTime) || null);
+			if (response.data?.checkOutTime === null) {
+				setCheckOutTime(null);
+			}
+			else {
+				setCheckOutTime(new Date(response.data?.checkOutTime));
+			}
+			console.log(checkOutTime)
+		} catch (error: any) {
+			console.error("Error fetching user information:", error.response?.data?.message || error.message);
+		}
+	}
+
+	const getRandomQuote = () => {
+		const randomIndex = Math.floor(Math.random() * quotes.length);
+		setQuote(quotes[randomIndex]);
+	};
+
+	useEffect(() => {
 		getUserInformation();
 		getRandomQuote();
 	}, []);
 
+	const onRefresh = React.useCallback(() => {
+		setRefreshing(true);
+		getUserInformation();
+		getRandomQuote();
+		setTimeout(() => {
+			setRefreshing(false);
+		}, 2000);
+
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -71,65 +97,87 @@ const Home = () => {
 					source={require('../../assets/images/react-logo.png')}
 				/>
 			</View>
+			<ScrollView
+				contentContainerStyle={styles.scrollView}
 
-			{/* Date Section */}
-			<View style={styles.dateContainer}>
-				<Text style={styles.dateText}>{date}</Text>
-				<Text style={styles.monthText}>{new Date().toLocaleString('default', { month: 'long' })}</Text>
-			</View>
+				refreshControl={
+					<RefreshControl
+						tintColor={'blue'}
+						refreshing={refreshing} onRefresh={onRefresh} />
+				}>
+				{/* Date Section */}
+				<View style={styles.dateContainer}>
+					<Text style={styles.dateText}>{date}</Text>
+					<Text style={styles.monthText}>{new Date().toLocaleString('default', { month: 'long' })}</Text>
+				</View>
 
-			{/* Check-In / Check-Out Section */}
-			<View style={styles.checkContainer}>
-				<View style={styles.checkInOut}>
-					<Text style={styles.checkLabel}>Check In</Text>
-					<Text style={styles.checkTime}>
-						--:--
+				{/* Check-In / Check-Out Section */}
+				<View style={styles.checkContainer}>
+					<View style={styles.checkInOut}>
+						<Text style={styles.checkLabel}>Check In</Text>
+						{checkInTime === null ? <Text style={styles.checkTime}>
+							<Text style={styles.checkTime}>
+
+								--:--
+							</Text>
+						</Text> :
+							<Text style={styles.checkTime}>
+								{`${checkInTime?.getHours()}` === 'NaN' ? `--:-- ` : `${checkInTime?.getHours()} : ${checkInTime?.getMinutes()}`}
+							</Text>}
+					</View>
+					<View style={styles.checkInOut}>
+						<Text style={styles.checkLabel}>Check Out</Text>
+						{checkOutTime === null ?
+							<Text style={styles.checkTime}>
+								<Text style={styles.checkTime}>
+									--:--
+								</Text>
+							</Text> :
+							<Text style={styles.checkTime}>
+								{`${checkOutTime?.getHours()}` === 'NaN' ? `--:-- ` : `${checkOutTime?.getHours()} : ${checkOutTime?.getMinutes()}`}
+							</Text>}
+					</View>
+				</View>
+
+				{/* Buttons Section */}
+				<View style={styles.buttonContainer}>
+					<View style={styles.iconContainer}>
+						<TouchableOpacity
+							onPress={handleCheckIn}
+							style={styles.iconCircle}>
+							<Ionicons name='pencil' size={24} color={'orange'} />
+						</TouchableOpacity>
+						<Text style={styles.iconText}>Check In</Text>
+					</View>
+					<View style={styles.iconContainer}>
+						<TouchableOpacity
+							onPress={handleCheckOut}
+							style={styles.iconCircle}>
+							<Ionicons name='hand-left' size={24} color={'purple'} />
+						</TouchableOpacity>
+						<Text style={styles.iconText}>Check Out</Text>
+					</View>
+					<View style={styles.iconContainer}>
+						<TouchableOpacity style={styles.iconCircle}>
+							<Ionicons name='location' size={24} color={'blue'} />
+						</TouchableOpacity>
+						<Text style={styles.iconText}>Remote In</Text>
+					</View>
+					<View style={styles.iconContainer}>
+						<TouchableOpacity style={styles.iconCircle}>
+							<Ionicons name='airplane' size={24} color={'gray'} />
+						</TouchableOpacity>
+						<Text style={styles.iconText}>Remote Out</Text>
+					</View>
+				</View>
+
+				{/* Quote Section */}
+				<View style={styles.quotesContainer}>
+					<Text style={styles.quoteText}>
+						{quote ? `"${quote.quote}" - ${quote.author}` : 'No quote available at the moment'}
 					</Text>
 				</View>
-				<View style={styles.checkInOut}>
-					<Text style={styles.checkLabel}>Check Out</Text>
-					<Text style={styles.checkTime}>
-						'--:--'
-					</Text>
-				</View>
-			</View>
-
-			{/* Buttons Section */}
-			<View style={styles.buttonContainer}>
-				<View style={styles.iconContainer}>
-					<TouchableOpacity
-						onPress={checkIn}
-						style={styles.iconCircle}>
-						<Ionicons name='pencil' size={24} color={'orange'} />
-					</TouchableOpacity>
-					<Text style={styles.iconText}>Check In</Text>
-				</View>
-				<View style={styles.iconContainer}>
-					<TouchableOpacity style={styles.iconCircle}>
-						<Ionicons name='hand-left' size={24} color={'purple'} />
-					</TouchableOpacity>
-					<Text style={styles.iconText}>Check Out</Text>
-				</View>
-				<View style={styles.iconContainer}>
-					<TouchableOpacity style={styles.iconCircle}>
-						<Ionicons name='location' size={24} color={'blue'} />
-					</TouchableOpacity>
-					<Text style={styles.iconText}>Remote In</Text>
-				</View>
-				<View style={styles.iconContainer}>
-					<TouchableOpacity style={styles.iconCircle}>
-						<Ionicons name='airplane' size={24} color={'gray'} />
-					</TouchableOpacity>
-					<Text style={styles.iconText}>Remote Out</Text>
-				</View>
-			</View>
-
-			{/* Quote Section */}
-			<View style={styles.quotesContainer}>
-				<Text style={styles.quoteText}>
-					{quote ? `"${quote.quote}" - ${quote.author}` : 'No quote available at the moment'}
-				</Text>
-			</View>
+			</ScrollView>
 		</SafeAreaView>
 	);
 };
@@ -165,6 +213,9 @@ const styles = StyleSheet.create({
 		borderRadius: 25,
 		borderWidth: 2,
 		borderColor: '#dee2e6',
+	},
+	scrollView: {
+		flex: 1
 	},
 	dateContainer: {
 		alignItems: 'center',
