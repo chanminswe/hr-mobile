@@ -32,6 +32,16 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/assets/notification-icon.png",
+          "color": "#082849",
+          "sounds": [
+            "./local/assets/sound/noti-sound.wav"
+          ]
+        }
       ]
     ],
     "experiments": {
